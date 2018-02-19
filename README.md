@@ -11,6 +11,6 @@ This is just a place to keep useful things for my xpenology box based on HP Micr
 ```
 insmod i2c-piix4.ko
 insmod k10temp.ko
-modprobe i2c-piix4.ko
-modprobe k10temp.ko
+modprobe i2c-piix4
+modprobe k10temp
 ```
