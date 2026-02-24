@@ -1,5 +1,6 @@
-# Overview
-This is just a place to keep useful things for my xpenology box based on HP Microserver Gen7 N54L.
+# XPenology Mods for HP MicroServer Gen7 N54L
+
+Custom kernel modules and patches for XPenology DSM 6.1 (kernel 3.10.102) on HP MicroServer Gen7 N54L (AMD Turion II).
 
 ## HWMon drivers
 - i2c-piix4.ko kernel module (https://github.com/fetzerch/hp-n54l-drivers)
@@ -7,7 +8,7 @@ This is just a place to keep useful things for my xpenology box based on HP Micr
 - k10temp.ko
 - w83795.ko
 
-## Loading drivers
+### Loading
 ```
 insmod i2c-piix4.ko
 insmod k10temp.ko
@@ -16,13 +17,23 @@ modprobe k10temp
 ```
 
 ## KVM AMD support
-- kvm-amd.ko - patched KVM AMD (SVM) module for DSM 6.1 kernel 3.10.102
 
-The stock Synology kernel is compiled with `CONFIG_CPU_SUP_AMD=n`, so `boot_cpu_data.x86_vendor`
-is never set to AMD. The stock `cpu_has_svm()` check fails with "not amd" even on genuine AMD CPUs.
+Patched `kvm-amd.ko` module enabling KVM/SVM virtualization on AMD CPUs.
 
-This module patches `has_svm()` in `svm.c` to check for AMD vendor directly via CPUID instruction,
-bypassing the broken `boot_cpu_data`. Works on any AMD CPU with SVM (AMD-V) support.
+### Why is this needed?
+
+The stock Synology kernel is compiled with `CONFIG_CPU_SUP_AMD=n`, which means
+`boot_cpu_data.x86_vendor` is never set to `X86_VENDOR_AMD`. As a result, the
+kernel's `cpu_has_svm()` check in `virtext.h` fails with "not amd" even on
+genuine AMD hardware, making it impossible to load `kvm-amd` and use hardware
+virtualization.
+
+This module patches `has_svm()` in `svm.c` to check for AMD vendor directly
+via CPUID instruction, bypassing the broken `boot_cpu_data`. Works on any AMD
+CPU with SVM (AMD-V) support.
+
+Use with [synoKVM](https://github.com/bsdcpp/synoKVM) — a QEMU/libvirt/webvirtmgr
+package for Synology DSM.
 
 ### Loading
 ```
